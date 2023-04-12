@@ -1,5 +1,5 @@
 1. ECS란
-- amazon container service로 "컨테이너 오케스트레이션 툴" like k8s
+- elastic container service로 "컨테이너 오케스트레이션 툴" like k8s
 
 2. ECS의 구성요소
 - <img width="733" alt="스크린샷 2023-04-12 오전 11 25 16" src="https://user-images.githubusercontent.com/62214428/231331688-4d3b3b15-135a-4371-8fed-d47790582b70.png">

@@ -31,6 +31,22 @@ Service는 Task Definitions를 이용하여 Task 실행 유형(EC2 or Fargate), 
 테스크가 실행 되어야할 작업 개수, 배포 방식(롤링 or Blue Green), 배치 전략, AutoScale 설정 및 컨테이너와 ELB(ALB or NLB)등을 
 설정하여 Task를 실행 및 관리 하도록 도와준다.
 ```
+
+
+- 서비스에서 실행 유형은 ec2, fargate 두 가지가 존재.
+- <img width="948" alt="스크린샷 2023-04-12 오전 11 34 42" src="https://user-images.githubusercontent.com/62214428/231333218-fe180921-2780-4a16-a0e0-09b6f09c85c9.png">
 ```
-서비스에는 EC2, Fargate라는 두 가지 task 실행 유형을 제공.
+- hosting : 컨테이너를 위한 컴퓨팅 리소스
+EC2 : vm으로 독립된 환경이 있고 개별 운영체제를 갖는 컴퓨팅 리소스
+Fargate : EC2보다 더 추상화된 컴퓨팅 환경. 기본 인프라 관리할 필요 없는 EC2의 서버리스 버전
 ```
+```
+서비스에서 타입은 replica와 daemon 두 가지가 존재.
+- replica : 복제는 서비스에 정의된 작업 개수 및 AutoScale 설정에 따라 클러스터 인스턴스에 Task가 복제하여 실행하는 방식
+- daemon : 클러스터내 모든 ecs 인스턴스에 task가 무조건 하나씩 실행
+```
+
+#### Cluster
+- 클러스터는 컨테이너 인스턴스(EC2)의 논리적인 그룹화 이다.
+- 논리적인 공간이므로, 컨테이너 인스턴스가 없는 빈 클러스터도 생성이 가능하다.
+- ECS Agent를 통해 논리적인 클러스터에 연결된다.

@@ -27,6 +27,7 @@
 ### 파일 스토리지 vs 오브젝트 스토리지
 - ![filesystemvsobject](https://user-images.githubusercontent.com/62214428/233921251-188931aa-8e10-4792-93ca-6c326e79f6c2.png)
 
+### 블록 스토리지 vs 
 ```
 차이점
 예를 들어보겠습니다. 구글링하면 나오는 대표적인 예제인데, 

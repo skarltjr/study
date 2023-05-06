@@ -75,4 +75,12 @@ internal : private ip를 통해 내부에서만 로드밸런싱
 - <img width="748" alt="스크린샷 2023-05-07 오전 3 20 07" src="https://user-images.githubusercontent.com/62214428/236640585-1bbc383b-6a2c-48de-803e-6e589c258627.png">
 - <img width="656" alt="스크린샷 2023-05-07 오전 3 20 10" src="https://user-images.githubusercontent.com/62214428/236640591-b8f8ccc1-59d9-4aeb-9593-a38a354ca216.png">
 
+### route53과 alb 연동
+- 호스팅 영역 추가
+- <img width="1110" alt="스크린샷 2023-05-07 오전 3 26 00" src="https://user-images.githubusercontent.com/62214428/236640846-dca07cf9-f7a9-440a-883d-693ef12f7149.png">
+- <img width="531" alt="스크린샷 2023-05-07 오전 3 26 31" src="https://user-images.githubusercontent.com/62214428/236640890-c0392095-ffbb-451f-947d-316e367d9bd7.png">
+- <img width="292" alt="스크린샷 2023-05-07 오전 3 26 34" src="https://user-images.githubusercontent.com/62214428/236640891-4f804336-1d43-4215-950b-c7b96e0b9201.png">
 
+---- 
+
+- https://velog.io/@madmingi/AWSELB-%EC%8B%A4%EC%8A%B5

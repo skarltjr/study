@@ -8,7 +8,11 @@
 - nacl : 서브넷 방화벽
 - sc : 인스턴스 방화벽
 ```
-- ![image](https://user-images.githubusercontent.com/62214428/236634179-be844fef-44f4-4cb7-a3f9-1d5e8b2fa66e.png)
+- ![image](https://user-images.githubusercontent.com/62214428/236638041-5155d04c-46a3-4e94-85ea-3e1a0b02b6f8.png)
+```
+참고로 서브넷 1개만 할 예정.. 돈...나감
+```
+
 
 ### 1. 도메인 구입
 - 현재 도메인을 구입했으며 route53을 통해 네임서버 자동 등록

@@ -9,9 +9,6 @@
 - sc : 인스턴스 방화벽
 ```
 - ![image](https://user-images.githubusercontent.com/62214428/236638041-5155d04c-46a3-4e94-85ea-3e1a0b02b6f8.png)
-```
-참고로 서브넷 1개만 할 예정.. 돈...나감
-```
 
 
 ### 1. 도메인 구입

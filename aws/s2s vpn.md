@@ -25,3 +25,19 @@ aws
 
 
 - https://bosungtea9416.tistory.com/entry/AWS-Site-to-Site-VPN-%EA%B5%AC%EC%84%B1%ED%95%98%EA%B8%B0
+
+----
+aws azure
+vpc : virtual network
+
+azure
+1. virtual network gateway를 만들기 전 gateway subnet 구성 필요
+- gatewaysubnet이라는 특정 서브넷이 필요하다고한다. -> 이거 어떻게 구성하면 좋을지 물어봐야한다.
+
+cgw : local network gateway
+vgw : virtual network gateway
+
+
+- https://learn.microsoft.com/ko-kr/azure/vpn-gateway/tutorial-site-to-site-portal
+- https://azurekor.com/m/221
+

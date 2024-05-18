@@ -75,3 +75,5 @@ Fargate : EC2보다 더 추상화된 컴퓨팅 환경. 기본 인프라 관리�
 - ![image](https://github.com/skarltjr/study/assets/62214428/de26508e-7049-40d1-ab56-a001c714cdca)
 - ecs 한계 : 같은 서비스에 속하지만 서로 다른 host에 떠있는 task간 통신은 어려울 것.
 - 조금 더 알아보자면 ecs task의 network 모드를 보면
+  - awsvpc: 태스크에 고유한 ENI(Elastic Network Interface)와 기본 private IPv4 주소 할당
+  - 태스크에 EC2 인스턴스와 동일한 네트워킹 속성 적용

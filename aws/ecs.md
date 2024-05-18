@@ -74,6 +74,7 @@ Fargate : EC2보다 더 추상화된 컴퓨팅 환경. 기본 인프라 관리�
 - 즉 ecs는 서로 다른 host에 위치한 컨테이너간 통신에서 (컨테이너!에 할당된 private ip를 통한 통신이 아니라) host에 할당된 private ip를 통해 호스트에 도달하고 port를 통해 접근한다.
 - ![image](https://github.com/skarltjr/study/assets/62214428/de26508e-7049-40d1-ab56-a001c714cdca)
 - ecs 한계 : 같은 서비스에 속하지만 서로 다른 host에 떠있는 task간 통신은 어려울 것.
+- overlay network보다 낮은 성능
 
 
 

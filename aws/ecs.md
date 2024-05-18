@@ -9,9 +9,7 @@
 - Service
 - Container Instance
 - Cluster
-----
-- ![ecs-layers](https://github.com/skarltjr/study/assets/62214428/04f19856-90fa-461f-ac2b-a09704a2629e)
-- ecs의 경우 단일 control plane(스케줄러)이 인스턴스들의 스케줄을 관리하는 중앙 집중식이다 / 쿠버네티스의 경우 여러 컨트롤 플레인이 존재하는 아키텍처를 따른다 
+
 #### Task Definition
 - 컨테이너 생성시 설정을 정의
   - 쿠버네티스에서의 deployments의 yaml과 비슷
@@ -53,3 +51,19 @@ Fargate : EC2보다 더 추상화된 컴퓨팅 환경. 기본 인프라 관리�
 - 클러스터는 컨테이너 인스턴스(EC2)의 논리적인 그룹화 이다.
 - 논리적인 공간이므로, 컨테이너 인스턴스가 없는 빈 클러스터도 생성이 가능하다.
 - ECS Agent를 통해 논리적인 클러스터에 연결된다.
+
+
+------------
+### ecs의 구조적 특징
+1. single control plane
+- ![ecs-layers](https://github.com/skarltjr/study/assets/62214428/04f19856-90fa-461f-ac2b-a09704a2629e)
+- ecs의 경우 단일 control plane(스케줄러)이 인스턴스들의 스케줄을 관리하는 중앙 집중식이다 / 쿠버네티스의 경우 여러 컨트롤 플레인이 존재하는 아키텍처를 따른다
+
+2. docker host
+- ![image](https://github.com/skarltjr/study/assets/62214428/c5dcf71e-2ccf-4161-9543-1624872a1ff5)
+- 일반적으로 컨테이너는 vm에 비해 더 높은 성능과 효율성을 장점으로 말한다.
+- 그런데 ecs는 컨테이너 전용 서버들을 구성한게 아니라 vm과 같은 ec2 instance 위에서 컨테이너를 동작시킨다 / vm위에서 컨테이너를 동작시킨다?? => 컨테이너의 장점이 사라지는거아니야?
+- 기존 ec2 기반 생태계(Network 서비스인 VPC와 ELB, EIP 에서 부터 Auto scaling)와의 연계의 장점을 얻을 수 있었다
+- 반대로 얘기하면 완전한 docker 기반 ochestration은 아니며 그에 따른 단점은 존재한다
+
+2-1. Overlay network 가 아닌 ELB 를 이용한 Network 구조

@@ -67,5 +67,11 @@ Fargate : EC2보다 더 추상화된 컴퓨팅 환경. 기본 인프라 관리�
 - 반대로 얘기하면 완전한 docker 기반 ochestration은 아니며 그에 따른 단점은 존재한다
 
 2-1. Overlay network 가 아닌 ELB 를 이용한 Network 구조
-
+- 먼저 underlay network란 실제 물리 장비를 통해 연결된 네트워크다. 여기서 이웃 노드는 실제로 물리 장비로 연결된 노드들이다.
+- 반면 overlay network이란 이런 기존 네트워크위에 논리적으로 링크들로 구성된 가상네트워크다. 여기서 이웃 노드란 실제 물리적으로 연결된 노드가 아니라 논리적으로 연결된 노드들이다.
+- 서비스 규모가 커지면서 오케스트레이션에서 생기는 고민은 서로 다른 호스트에 위치한 컨테이너간 통신이었다. 그리고 이걸 overlay network로 극복했다.
+- 하지만 ecs는 다르다. ecs는 overlay network이 아닌 elb를 활용한다.
+- 즉 ecs는 서로 다른 host에 위치한 컨테이너간 통신에서 (컨테이너!에 할당된 private ip를 통한 통신이 아니라) host에 할당된 private ip를 통해 호스트에 도달하고 port를 통해 접근한다.
+- ![image](https://github.com/skarltjr/study/assets/62214428/de26508e-7049-40d1-ab56-a001c714cdca)
 - ecs 한계 : 같은 서비스에 속하지만 서로 다른 host에 떠있는 task간 통신은 어려울 것.
+- 조금 더 알아보자면 ecs task의 network 모드를 보면

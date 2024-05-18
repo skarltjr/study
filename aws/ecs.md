@@ -9,7 +9,9 @@
 - Service
 - Container Instance
 - Cluster
-
+----
+- ![ecs-layers](https://github.com/skarltjr/study/assets/62214428/04f19856-90fa-461f-ac2b-a09704a2629e)
+- ecs의 경우 단일 control plane(스케줄러)이 인스턴스들의 스케줄을 관리하는 중앙 집중식이다 / 쿠버네티스의 경우 여러 컨트롤 플레인이 존재하는 아키텍처를 따른다 
 #### Task Definition
 - 컨테이너 생성시 설정을 정의
   - 쿠버네티스에서의 deployments의 yaml과 비슷

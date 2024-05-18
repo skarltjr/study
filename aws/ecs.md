@@ -67,3 +67,5 @@ Fargate : EC2보다 더 추상화된 컴퓨팅 환경. 기본 인프라 관리�
 - 반대로 얘기하면 완전한 docker 기반 ochestration은 아니며 그에 따른 단점은 존재한다
 
 2-1. Overlay network 가 아닌 ELB 를 이용한 Network 구조
+
+- ecs 한계 : 같은 서비스에 속하지만 서로 다른 host에 떠있는 task간 통신은 어려울 것.

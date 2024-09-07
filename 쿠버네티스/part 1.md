@@ -15,7 +15,7 @@
       - base image뿐만 아니라 ls, which 등 명령어도 모두 디렉토리로 구성되어 있고 이러한 layer를 쌓아 lower layer를 만든다.
       - 그러니 도커허브등은 재사용되는 파일시스템을 매 번 개별 저장할 필요가 없다.
       - 참고로 도커에서 FROM,COPY,CMD,RUN.. 모두 새로운 layer를 이전 layer에 쌓아 만든다.
-    - upper layer : writable영역으로 각 컨테이너마다 개별 존재.
+    - upper layer: writable영역으로 각 컨테이너마다 개별 존재.
     - merge view : lower + upper의 결과물로 실제 컨테이너에서 보여지는 영역
   - CoW(copy on write.원본유지) :
     - 컨테이너의 기본이 되는 lower layer는 readonly.

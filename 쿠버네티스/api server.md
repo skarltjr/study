@@ -27,4 +27,5 @@
   - 이 컨트롤러들은 security policies를 검토, 리소스 제한등을 수행한다
 - Watch for Updates : apiserver는 특정 객체의 변경사항을 감시하고 updates stream을 반환한다
   - 이것은 desired state를 유지하는데 매우 중요하다.
+  - api server를 통해 리소스의 update stream을 전달받으며 이상있을 시 control-loop는 선언된 상태로 유지하도록 행동한다.
 - Data Storage : 요청을 통해 클러스터의 상태가 변화되면 apiserver는 etcd에 내용을 수정 및 저장한다.

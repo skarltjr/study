@@ -54,5 +54,18 @@
 - WithAuthorization : 모두 인증된 요청이 넘어오며, 인가 단계를 진행
   - 권한 여부를 판단하여 멀티플렉서에게 전달하여 요청 라우팅
 
+4. api server는 etcd와 어떻게 통신하는가
+- 쿠버네티스 api server는 etcd 클라이언트를 직접 호출하는것이 아니라 이를 한단계 래핑하여 추상화된 레이어를 활용한다
+  - 그리고 이 추상화된 레이어 안에서 etcd 클라이언트가 사용된다
+  - 즉 etcd 클라이언트 동작방식을 이해해봐야한다.
+```
+- etcd 클라이언트는 etcd 클러스터 노드들에 대한 TCP 커넥션을 모두 들고 있다.
+- write/read 상관없이 모든 요청은 라운드 로빈 형태로 각 etcd 멤버들에게 전달된다.
+- 만약 읽기 요청이라면 요청을 전달받은 etcd 노드가 그대로 응답을 반환한다
+- 만약 쓰기 요청이면서 전달받은 etcd 노드가 leader라면 리더가 이를 처리한다.
+- 만약 쓰기 요청이면서 전달받은 etcd 노드가 follower라면 리더에게 전달한다.
+```
+
 -------
 https://www.redhat.com/es/blog/kubernetes-deep-dive-api-server-part-1
+

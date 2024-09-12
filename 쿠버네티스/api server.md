@@ -13,10 +13,10 @@
   - 업데이트된 내용이 모든 컴포넌트에 동기화될 수 있도록 보장한다.
 - `Authentication`
   - 인증
-  - 쿠버네티스 클러스터내 요청으로부터 해당 요청을 수행할 수 있는 권한이 존재하는지 확인합니다.
+  - 쿠버네티스 클러스터내 요청으로부터 해당 요청의 요청자를 식별
 - `Authorization`
   - 인가
-  - 요청이 인증되었다면, apiserver는 요청자의 요청 수행을 허용할지 판단합니다.
+  - 쿠버네티스 클러스터내 요청으로부터 해당 요청을 수행할 수 있는 권한이 존재하는지 확인합니다.
 - `Admission Control`
   - 중요 보안 및 거버넌스 툴
   - 요청 수행을 허락하기 전, apiserver는 여러 admission control module을 거쳐 특정 조건에서 요청을 수락하거나 거절할지 결정
@@ -31,7 +31,7 @@
   - 인가(authorization)는 쿠버네티스내에 정의된 role과 policies로 관리된다
 - `Admission Control` : 요청이 수행되기전, 다양한 admission controller들을 거친다.
   - 이 컨트롤러들은 security policies를 검토, 리소스 제한등을 수행한다
-- `Watch for Updates` : apiserver는 특정 객체의 변경사항을 감시하고 updates stream을 반환한다
+- `Watch for Updates` : apiserver는 특정 객체의 변경사항을 감시하는 updates stream을 반환한다
   - 이것은 desired state를 유지하는데 매우 중요하다.
   - control-loop는 api server를 계속 watch하여 리소스의 update stream을 전달받으며 이상있을 시 선언된 상태로 유지하도록 행동한다.
 - `Data Storage` : 요청을 통해 클러스터의 상태가 변화되면 apiserver는 etcd에 내용을 수정 및 저장한다.
@@ -51,6 +51,7 @@
 - WithAuthentication : 사용자를 인증하고, 인증후에는 context에 유저 정보를 저장한다.
   - 이때 인증이 끝난 요청에 대해서는 요청 헤더에서 Authorization 헤더를 제거한다
   - 이는 인증이 끝났기에 재인증 제거, 불필요한 정보를 다음으로 넘길 필요도 없으며, 보안상 이런 인증정보를 유지할 필요가없다.
+  - 인증을 마친뒤 적절한 권한을 부여한다.
 - WithAuthorization : 모두 인증된 요청이 넘어오며, 인가 단계를 진행
   - 권한 여부를 판단하여 멀티플렉서에게 전달하여 요청 라우팅
 

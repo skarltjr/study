@@ -27,7 +27,7 @@
   - controller manager가 명시된 state와 맞지 않으면 state를 맞추기위해 시도한다.
 - 이렇게 파드내 컨테이너의 상태(container state)를 지속적으로 파악하면서 이상이 있는 경우 pod를 healthy하게 만들기 위한 조치를 취한다.
 ```
-container state
+container status
 
 - waiting
 컨테이너가 running / terminated가 아닌 경우 해당 컨테이너는 waiting 상태
@@ -41,21 +41,10 @@ container state
 컨테이너에 문제가 생겨 컨테이너가 종료된 상태
 마찬가지로 reason, exit code등을 확인할 수 있다.
 ```
-- pod는 specification(명세)와 actual status가 존재한다.
-  - 당연히 pod의 상태를 지속적으로 살펴보며 명세에 맞게 조절하도록한다.
-```
-pod status
-
-PodScheduled: the Pod has been scheduled to a node.
-PodReadyToStartContainers: (beta feature; enabled by default) the Pod sandbox has been successfully created and networking configured.
-ContainersReady: all containers in the Pod are ready.
-Initialized: all init containers have completed successfully.
-Ready: the Pod is able to serve requests and should be added to the load balancing pools of all matching Services.
-```
 - pod는 생애 한 번만 스케줄링된다.
   - 특정 노드에 할당되어 실행
 ```
-pod의 state는 다음과 같다.
+pod의 status 다음과 같다.
 
 pending :
 pod가 스케줄링을 대기하거나 하나 이상의 컨테이너가 아직 실행준비가 완료되지 않은 상태
@@ -74,6 +63,18 @@ pod내 모든 컨테이너가 종료
 unknown :
 pod의 상태를 알 수 없는 상태
 pod가 실행중이어야할 노드와의 통신 오류가 존재
+```
+- pod는 specification(명세)와 위처럼 actual status가 존재한다.
+  - 당연히 pod의 상태를 지속적으로 살펴보며 명세에 맞게 조절하도록한다.
+  - 이때 pod가 어떤 조건에 해당하는지에 따라 자세히 분류된다.
+```
+pod condition
+
+PodScheduled: the Pod has been scheduled to a node.
+PodReadyToStartContainers: (beta feature; enabled by default) the Pod sandbox has been successfully created and networking configured.
+ContainersReady: all containers in the Pod are ready.
+Initialized: all init containers have completed successfully.
+Ready: the Pod is able to serve requests and should be added to the load balancing pools of all matching Services.
 ```
 
 - 만약 파드내 컨테이너 중 하나라도 fail되는 경우 특정 컨테이너를 재시작하려고한다.

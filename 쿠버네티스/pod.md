@@ -201,8 +201,8 @@ spec:
   - n개의 init container가 정상 실행 후 container 실행이 시작된다.
   - init container는 순차적으로 실행되며, 만약 init container 실행이 실패하면 kubelet은 재시작하고자한다.
   - 그러나 restart policy가 never인 경우 k8s는 파드가 실행에 실패했다고 판단한다.
-- 그럼 일반 container와의 차이가 무엇인가?
-  - init, sidecar container는 리소스 사용 규칙이 다르다
+- 그럼 일반 container, sidecar container는와의 차이가 무엇인가?
+  - init container는 리소스 사용 규칙이 다르다
 ```
 모든 init 컨테이너에 정의된 request, limit중 제한이 가장 높은것만 적용이된다.
 제한이 없으면 이것이 가장 높은 제한으로 간주된다.
@@ -220,3 +220,37 @@ spec:
 - init container는 application container보다 먼저 실행된다. 사이드카 컨테이너는 이후 application container와 함께 올라온다
 - init container는 probe를 지원하지 않는다.
 ```
+
+10. QoS / Quality of Service Classes:
+- 실행중인 파드를 분류하며, 분류에 따라 처리 방식이 달라진다
+- 파드 내 컨테이너의 resource request, limit에 따라 서로 다른 class로 분리한다.
+- Guaranteed, Burstable, BestEffort 가 존재
+- 이 분류는 노드의 리소스가 부족할때 어떤 파드를 eviction할지 결정할때 사용된다.
+```
+Guaranteed 클래스의 파드는 가장 엄격한 리소스 제한을 가지며 축출될 가능성이 가장 낮다
+자신의 제한을 초과하지 않는 한 또는 노드에서 우선순위가 낮은 파드가 없을 때까지 종료되지 않다.
+지정된 제한을 초과하여 리소스를 획득할 수 없다.
+이러한 파드는 static CPU management policy를 사용하여 독점적인 CPU를 사용할 수도 있다.
+
+Guaranteed QoS 클래스를 부여받기 위해서는 다음 조건을 모두 충족해야 합니다:
+- 파드의 모든 컨테이너는 cpu와 memory request/limit을 가져한다.
+- 파드의 모든 컨테이너의 cpu, memory는 request value == limit value이어야한다.
+```
+```
+Burstable 클래스의 파드는 request는 존재하지만 limit이 존재하지 않는 경우
+파드에 limit이 없는 경우 기본값은 node의 할당된 값과 같아서 노드의 자원을 활용할 수 있다.
+- 즉 노드의 자원을 온전히 다 사용할 수 있게되어버린다는 뜻
+- 노드에 16코어가 할당되어있고 다른 파드에 4개 코어가 할당되어 있으면 12개까지 사용가능
+
+Burstable QoS 클래스를 부여받기 위해서는 다음 조건을 모두 충족해야 합니다:
+- guranteed는 아니고
+- 파드 중 컨테이너 하나 이상이 cpu memory request or limit이 설정되어있어야한다.
+```
+```
+BestEffort class는 노드에 할당된 자원 중 남은 자원을 다 사용가능
+- 마찬가지로 노드에 16코어가 할당되어있고 다른 파드에 4개 코어가 할당되어 있으면 12개까지 사용가능
+- 그러나 파드 중 어느 컨테이너도 request or limit이 설정되어있지 않을때
+```
+- 참고로 파드의 request limit은 파드내 컨테이너들의 request limit의 합이다.
+- 반대로 말하면 컨테이너들의 req, limit이 없는 경우 파드는 기본값으로 노드의 cpu, mem만큼 req, limit이 설정된다.
+

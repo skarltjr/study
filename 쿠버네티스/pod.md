@@ -180,11 +180,10 @@ The diagnostic failed (no action should be taken, and the kubelet will make furt
   - 이러한 pod들은 connection 정리, session drainign이 먼저 수행된다.
 - 하지만 우아한 종료를 위한 grace period 이후에도 컨테이너가 남아있다면, sigkill로 강제 제거  
 ```
----
-init container
-- 잠깐! Initialized에서 말하는 init containers란 무엇일까?
-  - Init container는 파드의 컨테이너 내부에서 애플리케이션 container가 실행되기 전에 초기화를 수행하는 컨테이너이다.
-  - 먼저 필요한 스크립트등을 수행한다던가의 목적으로 사용될 수 있다.
+
+9. init container
+- Init container는 파드의 컨테이너 내부에서 애플리케이션 container가 실행되기 전에 초기화를 수행하는 컨테이너이다.
+- 먼저 필요한 스크립트등을 수행한다던가의 목적으로 사용될 수 있다.
 ```
 apiVersion: v1
 kind: Pod
@@ -203,4 +202,21 @@ spec:
   - init container는 순차적으로 실행되며, 만약 init container 실행이 실패하면 kubelet은 재시작하고자한다.
   - 그러나 restart policy가 never인 경우 k8s는 파드가 실행에 실패했다고 판단한다.
 - 그럼 일반 container와의 차이가 무엇인가?
-  - 
+  - init, sidecar container는 리소스 사용 규칙이 다르다
+```
+모든 init 컨테이너에 정의된 request, limit중 제한이 가장 높은것만 적용이된다.
+제한이 없으면 이것이 가장 높은 제한으로 간주된다.
+
+이때 pod의 request/limit은 다음처럼 결정된다.
+- 모든 application container request/limit의 합
+- init container request/limit
+중 더 큰 값이 pod의 request/limit이 된다.
+
+일반적으로 pod의 request/limit이 더 클것이다.
+이때 init container는 애플리케이션 container가 뜨기전에 실행되기에, 애플리케이션이 떠있지 않더라도 필요한 request/limit만큼의 자원을 먼저 예약한다.
+```
+- sidecar container와의 차이점
+```
+- init container는 application container보다 먼저 실행된다. 사이드카 컨테이너는 이후 application container와 함께 올라온다
+- init container는 probe를 지원하지 않는다.
+```

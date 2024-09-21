@@ -24,8 +24,21 @@ ip-10-29-104-121.ap-northeast-2.compute.internal   ip-10-29-104-121.ap-northeast
 ip-10-29-69-101.ap-northeast-2.compute.internal    ip-10-29-69-101.ap-northeast-2.compute.internal    27h
 ip-10-29-79-205.ap-northeast-2.compute.internal    ip-10-29-79-205.ap-northeast-2.compute.internal    88m
 ```
-- 쿠버네티스는 node의 status 객체가 아니라 경량화된 lease object에 대해서만 요청에 담아 보내기 때문에 이전 문제를 제거한다.
-- 
+- 목적은 노드가 살아있음을 업데이트하는것으로 각 kubelet이 각 노드에 존재하는 lease object를 업데이트함으로써 기존 node heartbeat를 대체한다.
+- 이를통해 기존처럼 status 자체를 업데이트 하지않으며 node status를 etcd에 기록하는 방식에서 벗어난다.
+  - etcd에도 lease object가 기록됨으로.
+  - 물론 아예 업데이트하지 않는것은 아니다. 중요 정보는 nodeStatus에 기록되며, 덜 빈번하게 업데이트한다.
+  - 대신 controller manager는 nodeStatus가 아닌 lease object를 모니터링하여 노드 상태를 파악한다.
+
+```
+동작 방식은
+Lease 생성: 노드가 클러스터에 가입되면, kubelet은 그 노드에 대한 Lease 객체를 생성합니다.
+Lease 갱신: kubelet은 노드 상태에 변화가 없는 경우에도 Lease 객체를 주기적으로 갱신합니다. / timestamp update
+    LeaseDurationSeconds: Lease가 만료되기까지의 기간을 정의합니다. 이 시간이 지나면 노드는 더 이상 정상적으로 작동하는 것으로 간주되지 않습니다.
+    RenewTime: Lease가 마지막으로 갱신된 시간을 나타냅니다.
+    HolderIdentity: Lease를 소유하고 있는 노드를 식별하는 정보입니다.  
+노드 장애 감지: 컨트롤러 매니저는 Lease 객체의 타임스탬프를 모니터링하여 노드의 상태를 판단합니다. Lease가 일정 시간 내에 갱신되지 않으면, 해당 노드는 비정상적이라고 판단됩니다.
+```
 
 5. 컴포넌트 수준의 리더 선출과 같은 시스템 핵심 기능에서 사용된다? 는 어떤 경우를 말하는걸까
 - ![image](https://github.com/user-attachments/assets/3a982d38-96ce-4c18-baca-e53ea18d4899)

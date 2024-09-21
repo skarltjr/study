@@ -76,7 +76,6 @@ ContainersReady: all containers in the Pod are ready.
 Initialized: all init containers have completed successfully.
 Ready: the Pod is able to serve requests and should be added to the load balancing pools of all matching Services.
 ```
-
 - 만약 파드내 컨테이너 중 하나라도 fail되는 경우 특정 컨테이너를 재시작하려고한다.
   - 파드내 문제가 있는 컨테이너는 다음처럼 다룬다
 ```
@@ -106,3 +105,102 @@ Backoff reset:
 - 파드와 연관된 볼륨등 파드와 함께 라이프 사이클을 가져야하는 것들이 존재한다.
 - 다시말해 파드가 종료되면 같이 제거되어야하고, 파드가 재생성되면 다시 생성된다.
 
+6. pod readiness
+- 컨테이너의 준비 상태를 파악할 수 있는 추가 요소
+- 각 목적에 맞는 probe(조사 방식)가 존재한다
+- livenessProbe
+  - 컨테이너 실행 여부를 나타낸다.
+  - liveness probe가 실패하면 kubelet은 해당 컨테이너를 종료하고 재시작 정책에 따라 처리된다.
+  - 컨테이너가 liveness probe를 제공하지 않으면 기본적으로 Success다
+- readinessProbe
+  - 컨테이너가 request에 응답할 준비가 되었는지 판단한다.
+  - readiness probe가 실패하면 엔드포인트 컨트롤러는 Pod의 IP 주소를 해당 Pod와 일치하는 모든 서비스의 엔드포인트에서 제거
+  - 마찬가지로 컨테이너가 readiness probe를 제공하지 않으면 기본적으로 Success다
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example-pod
+spec:
+  containers:
+  - name: example-container
+    image: your-image
+    readinessProbe:
+      httpGet:
+        path: /healthz
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 10
+```
+- startupProbe
+  - 컨테이너 내 애플리케이션 시작되었는지 판단할 수 있는 요소
+  - startupProbe가 존재하면 다른 모든 probe는 이 probe이 성공할때까지 비활성화
+  - 만약 startupProbe가 실패하면 컨테이너 종료 후 재시작 정책에 따라 처리
+  - 마찬가지로 컨테이너가 startupProbe를 제공하지 않으면 기본적으로 Success
+
+7. container probe
+- 그렇다면 readiness를 위해 컨테이너 상태를 파악할 container probe는 어떻게 구성되는가
+- check mechanism은 다음과 같다
+```
+exec: 지정된 명령어를 컨테이너 내부에서 실행합니다. 명령어가 0 상태 코드로 종료되면 진단은 성공한 것으로 간주됩니다.
+
+grpc: gRPC를 사용하여 원격 프로시저 호출을 수행합니다. 대상은 gRPC 상태 체크를 구현해야 합니다. 응답의 상태가 SERVING이면 진단은 성공한 것으로 간주됩니다.
+
+httpGet: 지정된 포트와 경로에서 Pod의 IP 주소로 HTTP GET 요청을 수행합니다. 응답의 상태 코드가 200 이상 400 미만이면 진단은 성공한 것으로 간주됩니다.
+
+tcpSocket: 지정된 포트에 대해 Pod의 IP 주소로 TCP 체크를 수행합니다. 포트가 열려 있으면 진단은 성공한 것으로 간주됩니다. 원격 시스템(컨테이너)이 연결이 열리자마자 바로 닫아도 이는 정상으로 간주됩니다.
+```
+- outcome은 다음과 같다
+```
+Success
+The container passed the diagnostic.
+
+Failure
+The container failed the diagnostic.
+
+Unknown
+The diagnostic failed (no action should be taken, and the kubelet will make further checks).
+```
+
+8. pod의 종료
+- kill signal로 갑작스런 중단이 아닌 gracefully terminate를 목표한다.
+- 목표는 종료 요청을 할 수 있으며, 프로세스 종료 시점을 알 수 있도록하며, 최종적으로 삭제가 완료됨을 보장하는것이다.
+- kubelet은 컨테이너 런타임에 종료를 요청한다
+  - 이때 각 컨테이너 주요 프로세스에 sigterm을 보낸다.
+    - sigkill은 프로세스의 자식 프로세스가 존재하는 경우에도 바로 죽여서 고아 프로세스가 남아있을 수 있다.
+  - https://github.com/skarltjr/study/blob/main/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4/%EC%BB%A8%ED%85%8C%EC%9D%B4%EB%84%88.md#:~:text=container%20runtime%20interface
+- 종료의 흐름은 다음과 같다
+```
+- pod 삭제 요청 : kubectl을 통해 특정 pod 제거 요청
+- api server 업데이트 : API 서버의 Pod는 Pod가 "죽은" 것으로 간주되는 시간과 유예 기간으로 업데이트 / `Terminating`으로 변경
+- kubelete의 종료 프로세스 시작 : pod가 Terminating으로 변경되면 kubelet은 로컬 pod 종료 프로세스를 시작
+  - 컨테이너 런타임을 통해 각 컨테이너 1번 프로세스에 sigterm 전달
+- service endpoint 업데이트 : kubelet이 pod의 graceful shutdown을 시작하는 동시에 control plane은 pod를 endpoint object에서 제거할지 결정
+  - Pods that shut down slowly들은 일반 트래픽이 전달되어선 안된다.
+  - 이러한 pod들은 connection 정리, session drainign이 먼저 수행된다.
+- 하지만 우아한 종료를 위한 grace period 이후에도 컨테이너가 남아있다면, sigkill로 강제 제거  
+```
+---
+init container
+- 잠깐! Initialized에서 말하는 init containers란 무엇일까?
+  - Init container는 파드의 컨테이너 내부에서 애플리케이션 container가 실행되기 전에 초기화를 수행하는 컨테이너이다.
+  - 먼저 필요한 스크립트등을 수행한다던가의 목적으로 사용될 수 있다.
+```
+apiVersion: v1
+kind: Pod
+metadata:
+ name: init-container-example
+spec:
+ initContainers: # 초기화 컨테이너
+ - name: my-init-container
+   image: busybox
+   command: ["sh", "-c", "echo Hello world!"]
+ containers: # 에플리케이션 컨테이너
+ - name: nginx
+   image: nginx
+```
+  - n개의 init container가 정상 실행 후 container 실행이 시작된다.
+  - init container는 순차적으로 실행되며, 만약 init container 실행이 실패하면 kubelet은 재시작하고자한다.
+  - 그러나 restart policy가 never인 경우 k8s는 파드가 실행에 실패했다고 판단한다.
+- 그럼 일반 container와의 차이가 무엇인가?
+  - 

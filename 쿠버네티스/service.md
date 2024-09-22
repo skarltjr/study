@@ -92,5 +92,14 @@ spec:
   - ![image](https://github.com/user-attachments/assets/663ec14e-a50a-4e97-a990-449e50b98fc7)
 
 4. 서비스 디스커버리
-- 
+- source가 target에 접근하기 위해선 ip:port가 필요하고 이를 찾아내는 기능이 서비스 디스커버리
+- 크게 DNS 기반, 환경변수 기반 서비스 디스커버리가 존재
+
+5. DNS service discovery
+- coreDNS와 같은 애드온과 함께 동작(기본은 kube-dns)
+- service의 생성을 인지하고 레코드를 생성한다.
+  - 예를 들면, 쿠버네티스 네임스페이스 my-ns에 my-service라는 서비스가 있는 경우, 컨트롤 플레인과 DNS 서비스가 함께 작동하여 my-service.my-ns에 대한 DNS 레코드를 만든다
+- 참고로 srv(service) record를 지원하여, ip와 함께 port를 찾아낼 수 있다.
+
+
 

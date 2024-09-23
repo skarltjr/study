@@ -12,6 +12,7 @@ linux의 namespace 기술이 쿠버네티스까지 도달했다.
 
 2. multiple namespaces
 - 쿠버네티스에서 네임스페이스의 기본 의도는 규모가 커진 팀, 프로젝트에서 다양한 환경을 위한 scope을 제공하기위함.
+- 그 예시로 네임스페이스에 리소스 쿼터를 지정하여 네임스페이스별 격리가 가능하다.
 - 기본 네임스페이스는 다음과 같다.
   - default
   - kube-node-lease : 각 노드 lease object와 관련된 네임스페이스

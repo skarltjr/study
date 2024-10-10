@@ -108,7 +108,7 @@ NoEncapMode에서는 source IP가 호스트 IP가 아닌 전송하는 Pod IP로 
     - 그렇기 때문에 대역 충돌이 발생할 가능성이 매우 낮다.
     - vpc cni의 장점은 파드가 같은 vpc내 ip를 할당받기 때문에 overlay network가 필요없다
     - calico 같은 경우 Ip in Ip가 디폴트로 패킷 en-de capsulation이 기본
-    - 반대로 말하면 vpc native한 구성은 이기종 시스템에서 overlay network를 통해 얻을 수 이점을 가질 수 없다고 생각.
+    - 반대로 말하면 vpc native한 구성은 이기종 시스템에서 nat없이 직접 통신등의 overlay network를 통해 얻을 수 이점을 가질 수 없다고 생각.
   - vpc cni에서는 eni를 기반으로 ip를 할당한다.
     - 각 인스턴스(노드)는 타입에 따라 n개의 eni를 가질 수 있으며 각 eni는 n개의 private ip를 가질 수 있다.
     - 인스턴스가 가질 수 있는 private ip 수 `(ENI 개수 × (ENI 당 IP Address 개수 - 1)) + 2`

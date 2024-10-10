@@ -102,9 +102,13 @@ NoEncapMode에서는 source IP가 호스트 IP가 아닌 전송하는 Pod IP로 
 
 --------
 ### eks ipam
+- ![image](https://github.com/user-attachments/assets/e853a0b3-f92a-4064-8484-8b277e019d10)
 - 기본적으로 eks는 vpc cni를 활용한다.
   - aws vpc를 활용함으로써 각 노드는 노드가 위치한 서브넷의 하위 대역 ip를 할당 받는다.
     - 그렇기 때문에 대역 충돌이 발생할 가능성이 매우 낮다.
+    - vpc cni의 장점은 파드가 같은 vpc내 ip를 할당받기 때문에 overlay network가 필요없다
+    - calico 같은 경우 Ip in Ip가 디폴트로 패킷 en-de capsulation이 기본
+    - 반대로 말하면 vpc native한 구성은 이기종 시스템에서 overlay network를 통해 얻을 수 이점을 가질 수 없다고 생각.
   - vpc cni에서는 eni를 기반으로 ip를 할당한다.
     - 각 인스턴스(노드)는 타입에 따라 n개의 eni를 가질 수 있으며 각 eni는 n개의 private ip를 가질 수 있다.
     - 인스턴스가 가질 수 있는 private ip 수 `(ENI 개수 × (ENI 당 IP Address 개수 - 1)) + 2`
@@ -112,5 +116,9 @@ NoEncapMode에서는 source IP가 호스트 IP가 아닌 전송하는 Pod IP로 
       - EC2 인스턴스가 가질 수 있는 최대 ENI 개수 = 3
       - EC2 인스턴스의 ENI가 가질 수 있는 최대 Private IP Address 개수 = 10
   - 조금 더 구체적으로 `L-IPAM(Local IP Address Manager)` 방식을 사용하는데
+    - l-ipam은 노드(인스턴스)의 메타데이터를 확인하여 private ip를 미리 준비하는데 이를 warm pool이라고 한다.
+    - 그리고 파드 생성 시점에 warm pool에서 ip를 가져와 실제 파드에 할당하고 기록하는것이 slot이다.
     - primary eni의 primary ip가 노드의 private ip가 되며
     - 각 eni의 secondary ip가 파드에 할당될 ip들이 된다.
+    - ![image](https://github.com/user-attachments/assets/c42ce192-41dc-4b12-ba69-89ac31a54556)
+

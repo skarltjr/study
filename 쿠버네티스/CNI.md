@@ -100,3 +100,17 @@ AWS EC2에는 패킷의 source IP가 패킷을 전송하는 호스트 IP와 동�
 NoEncapMode에서는 source IP가 호스트 IP가 아닌 전송하는 Pod IP로 찍히기 때문에 해당 기능을 비활성화 하지 않으면 패킷이 전달되지 않습니다.
 ```
 
+--------
+### eks ipam
+- 기본적으로 eks는 vpc cni를 활용한다.
+  - aws vpc를 활용함으로써 각 노드는 노드가 위치한 서브넷의 하위 대역 ip를 할당 받는다.
+    - 그렇기 때문에 대역 충돌이 발생할 가능성이 매우 낮다.
+  - vpc cni에서는 eni를 기반으로 ip를 할당한다.
+    - 각 인스턴스(노드)는 타입에 따라 n개의 eni를 가질 수 있으며 각 eni는 n개의 private ip를 가질 수 있다.
+    - 인스턴스가 가질 수 있는 private ip 수 `(ENI 개수 × (ENI 당 IP Address 개수 - 1)) + 2`
+    - 예를들어 `a1.large`의 경우 최대 29개의 private ip를 가질 수 있겠다.
+      - EC2 인스턴스가 가질 수 있는 최대 ENI 개수 = 3
+      - EC2 인스턴스의 ENI가 가질 수 있는 최대 Private IP Address 개수 = 10
+  - 조금 더 구체적으로 `L-IPAM(Local IP Address Manager)` 방식을 사용하는데
+    - primary eni의 primary ip가 노드의 private ip가 되며
+    - 각 eni의 secondary ip가 파드에 할당될 ip들이 된다.

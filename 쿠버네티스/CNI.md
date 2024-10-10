@@ -106,7 +106,7 @@ NoEncapMode에서는 source IP가 호스트 IP가 아닌 전송하는 Pod IP로 
 - 기본적으로 eks는 vpc cni를 활용한다.
   - aws vpc를 활용함으로써 각 노드는 노드가 위치한 서브넷의 하위 대역 ip를 할당 받는다.
     - 그렇기 때문에 대역 충돌이 발생할 가능성이 매우 낮다.
-    - vpc cni의 장점은 aws 기반 구성에서는 파드가 같은 vpc내 ip를 할당받기 때문에 overlay network가 필요없다
+    - vpc cni의 장점은 aws 기반 구성에서는 파드가 같은 vpc내 ip를 할당받기 때문에 서로 다른 노드의 파드간 통신에서 overlay network가 필요없이 nat없는 통신가능
     - calico 같은 경우 Ip in Ip가 디폴트로 패킷 en-de capsulation이 기본
     - 반대로 말하면 aws에 종속되고 다른 네트워크 정책 사용 제한이 될 수 있다.
   - vpc cni에서는 eni를 기반으로 ip를 할당한다.

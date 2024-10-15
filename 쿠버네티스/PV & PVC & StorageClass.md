@@ -46,3 +46,20 @@
 - recycle
   - pv의 데이터들을 삭제하고 새로운 pvc에서 이 pv를 사용할 수 있도록한다
   - 쿠버네티스에서 더 이상 사용되지 않는다
+
+### StorageClass
+- storageClass란 쿠버네티스에서 스토리지의 class를 정의할 수 있는 객체
+- storage의 class란 성능 요구사항, 백업 정책 혹은 정책을 의미하는데, 즉 이를통해 파드가 스토리지를 요청할 때 다양한 요구사항을 만족할 수 있도록한다.
+- StorageClass의 주요 기능
+  - 동적 스토리지 프로비저닝:
+    - StorageClass는 쿠버네티스 클러스터 내에서 PVC(Persistent Volume Claim)가 요청되었을 때, 스토리지를 동적으로 생성하는 방법을 정의
+    - 사용자가 명시적으로 Persistent Volume (PV)을 먼저 생성하지 않아도, PVC를 통해 StorageClass에 정의된 프로비저너가 자동으로 PV를 생성
+  - 스토리지 설정 정의:
+    - StorageClass는 스토리지의 종류(예: AWS EBS, Google Persistent Disk, NFS 등)와 각 스토리지에 대한 설정 옵션(예: 성능, 용량, 복제본 수 등)을 정의
+    - 이를 통해 사용자나 개발자는 스토리지의 세부 설정을 관리할 필요 없이, StorageClass만으로 스토리지를 자동으로 프로비저닝
+  - 스토리지 프로비저너 지정:
+    - StorageClass에서 중요한 속성 중 하나는 프로비저너(provisioner). 프로비저너는 특정 스토리지 시스템(AWS, GCE, Azure 등)에 맞춰 PV를 동적으로 생성하고 관리하는 CSI 드라이버나 내부 프로비저너를 의미합니다.
+  - Reclaim Policy 설정:
+    - StorageClass는 PV가 사용 중지되었을 때 해당 스토리지를 어떻게 처리할지 결정하는 Reclaim Policy(Retain, Delete)를 정의할 수 있습니다. 이는 PVC가 삭제된 후 PV와 그 스토리지를 어떻게 처리할지를 제어하는 역할을 합니다.
+  - 파라미터 설정:
+    - StorageClass는 스토리지 프로비저너에게 전달할 **파라미터(parameters)**를 설정할 수 있습니다. 이 파라미터들은 스토리지 유형별로 다를 수 있으며, 예를 들어 클라우드 블록 스토리지의 경우 성능 유형(IOPS), 스토리지 크기, 복제본 수 등 세부 설정을 포함할 수 있다.

@@ -71,7 +71,7 @@ TLS의 경우 SSL3.0 계승
 ```
 1. 인증서 발급 과정
 - 클라이언트가 private key 생성
-- private key로 CSR 생성 (이때 신원정보 포함)
+- private key로 CSR(Certificate Signing Request) 생성 (이때 신원정보 포함)
 - CSR을 ROOT CA에 전달
 - ROOT CA가 자신의 private key로 CSR에 서명하여 인증서 발급
 
@@ -82,6 +82,51 @@ TLS의 경우 SSL3.0 계승
   1) 인증서의 서명 검증 (위조 여부)
   2) 인증서 유효기간 등 검증
 - 검증 성공 시 인증서 내 신원정보(CN/O)로 권한 확인
+
+kubeconfig도 결국 위와 동일한데
+client(local)에서 개인키를 생성하고 쿠버네티스에 csr 전달
+crt(cert) 인증서 발급
+kubeconfig에 해당 인증서 설정함으로써 쿠버네티스 접근시 해당 인증서를 사용하고
+이를 통해 인증을 거친다.
+```
+
+```
+참고로 그럼 우리는 어떻게 kubeconfig를 활용하여 kubectl로 eks에 접근하는가?
+
+1. aws credential 세팅 => ~/.aws/credential
+2. 적절한 권한이 존재하니 eks로부터 kubeconfig 설정 정보를 받을 수 있다
+- aws eks --region <region-code> update-kubeconfig --name <cluster_name>
+3. 그럼 먼저, 내가 kubeconfig + kubectl(client)로써 접근하고자하는 대상 서버(eks api server)가 믿을 수 있는 대상인지 어떻게 판단하는가
+
+> cat ~/.kube/config를 확인해보면 certificate-authority-data를 확인할 수 있다.
+$ cat ~/.kube/config           
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJTm5E~~~~xxxxx~~~~lDQVRFLS0tLS0K
+    server: https://7398A2FE7F18173AC9B75F09C9288F0B.yl4.ap-northeast-2.eks.amazonaws.com
+  name: ~
+contexts:
+- context:
+    cluster: ~
+    user: ~
+
+> certificate-authority-data를 실제로 echo "certificate-authority-data" | base64 -d로 디코딩해보면 인증서 정보가 나온다
+-----BEGIN CERTIFICATE-----
+MIIDBTCCA~~~xxxx~~~alxb+7fvwwTE
+-----END CERTIFICATE-----
+
+
+> 즉 kubeconfig 설정시 인증서 정보를 인코딩한 데이터가 certificate-authority-data에 설정되는데
+이 certificate-authority-data 정보는 x.509 형식의 우리 eks Root CA 인증서로 클러스터의 다른 모든 인증서들을 검증하는 기준
+이제 클라이언트(kubectl) <-> API(eks api server) 서버 통신 과정에서
+- kubectl이 API 서버에 연결 시도
+- API 서버가 자신의 인증서 제시
+- kubectl이 CA 인증서로 API 서버 인증서 검증
+- 검증 성공시 안전한 통신 시작
+
+4. 그렇다면 kubeconfig를 통해 쿠버네티스는 어떻게 인증을 거치는가
+- aws eks는 좀 다른 방식(iam)
 ```
 
 3. 인가

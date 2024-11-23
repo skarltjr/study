@@ -84,6 +84,29 @@ TLS의 경우 SSL3.0 계승
 - 검증 성공 시 인증서 내 신원정보(CN/O)로 권한 확인
 ```
 
+3. 인가
+```
+# 예시: Pod 생성 요청이 들어왔을 때
+요청 컨텍스트:
+- 사용자: kidol
+- 그룹: dev-team
+- 네임스페이스: development
+- 리소스: pods
+- 동작: create
+
+인가 체크 순서:
+1) RoleBinding/ClusterRoleBinding 검색
+   - 사용자 'kidol' 또는 그룹 'dev-team'에 연결된 바인딩 확인
+
+2) Role/ClusterRole 권한 확인
+   - 바인딩된 Role의 rules 섹션 검사
+   - apiGroups, resources, verbs 매칭 확인
+
+3) 결정
+   - 모든 조건 만족 → 허용
+   - 하나라도 불만족 → 거부 (403 Forbidden)
+```
+
 ### HTTP Authentication
 - http header를 통해 인증정보 전달(auth token)
 - Authorization: <type> <credentials>

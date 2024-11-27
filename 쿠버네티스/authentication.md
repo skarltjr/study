@@ -76,12 +76,14 @@ TLS의 경우 SSL3.0 계승
 - ROOT CA가 자신의 private key로 CSR에 서명하여 인증서 발급
 
 2. API 서버 인증 과정
+- tls를 위한 핸드쉐이크 시작
 - 클라이언트가 요청에 private key로 디지털 서명
 - 인증서와 함께 API 서버로 전송
 - API 서버는 ROOT CA의 public key로:
   1) 인증서의 서명 검증 (위조 여부)
   2) 인증서 유효기간 등 검증
 - 검증 성공 시 인증서 내 신원정보(CN/O)로 권한 확인
+- 이후 대칭키로 암호화된 통신
 
 kubeconfig도 결국 위와 동일한데
 client(local)에서 개인키를 생성하고 쿠버네티스에 csr 전달

@@ -127,6 +127,7 @@ MIIDBTCCA~~~xxxx~~~alxb+7fvwwTE
 
 4. 그렇다면 kubeconfig를 통해 쿠버네티스는 어떻게 인증을 거치는가
 - aws eks는 좀 다른 방식(iam)
+- eks는 commnad를 통해 aws의 토큰을 생성하여 쿠버네티스에 bearer <token>으로 http 인증 방식으로.
 ```
 
 3. 인가

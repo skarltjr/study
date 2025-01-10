@@ -22,4 +22,46 @@ func example() *int {
     return &i     // i는 함수의 스코프를 벗어나므로 힙에 할당
 }
 ```
+4. Tracing Garbage Collection
+- 기본적으로 go는 가비지 추적 방식을 사용한다.
+  - 메모리 공간을 할당받은 object와 이 메모리 공간을 가르키는 주소인 포인터가 존재하는데
+- 이러한 객체와 포인터의 object 그래프를 루트부터 시작하여 탐색한다
+  - 그래프를 따라가면서 스캔하고, 더 이상 사용되지 않는 객체를 식별한다.
+  - 사용중인 객체는 Mark해둔다
+  - 이후 힙 영역 메모리를 모두 확인하여 Mark되지 않은 객체의 메모리 공간을 재사용할 수 있도록 sweep한다
 
+5. gc cycle
+- Sweep Phase (스윕 단계)
+  - 실제로 청소하는 단계로, 이를 위해선 mark 작업이 선행되어야한다. 즉 모든 메모리가 추적되기 전까진 청소할 수 없다.
+- Off Phase (비활성 단계)
+  - gc와 관련없는 단계로, 정상적으로 애플리케이션이 실행되는 phase
+- Mark Phase (마크 단계)
+  - sweep 단계와 반드시 분리되어야하는데
+  - 살아있는 객체를 식별하는 단계로, 모든 마킹이 완료되어야 청소가 가능하다
+```
+sweep - off - mark
+```
+6. gc cost
+- 메모리 비용
+  - live heap memory : 이전 gc 주기에서 사용중으로 판별된 영역. 실제 사용중으로 gc가 제어할 수 없다.
+  - new heap memory : 현재 gc 주기동안 새로 할당된 메모리 공간. 다음 gc때 사용 여부를 판단
+  - 메타데이터 : 위 두 메모리 공간에 비해 매우 작다. gc 메타데이터 저장용
+- 메모리 비용 공식 : 
+```
+GC Memory Cost for Cycle N=Live Heap from Cycle N-1+New Heap
+```
+- cpu 비용
+  - 고정 비용 : 각 gc마다 발생하는 일정한 작업으로 데이터 구조 초기화 작업 등으로 굉장히 작고 무시가능
+  - 마진 비용 : live heap memory 영역 크기에 비례하는 cpu 비용. marking와 scanning에 사용되는 cpu 비용으로 gc의 주요 cpu 자원 사용 영역
+- cpu 비용 공식 : 
+```
+GC CPU Time for Cycle N=Fixed Cost+(Average Cost per Byte×Live Heap)
+```
+
+7. gc 주기와 트레이드 오프
+- GC 실행 빈도가 높아지면:
+  - 메모리 사용량 감소: 더 자주 메모리를 회수하므로 힙 크기가 작아집니다.
+  - CPU 오버헤드 증가: GC가 더 자주 실행되므로 CPU 자원을 더 많이 소비합니다.
+- GC 실행 빈도가 낮아지면:
+  - 메모리 사용량 증가: 회수되지 않은 메모리가 쌓여 힙 크기가 커집니다.
+  - CPU 오버헤드 감소: GC 실행 횟수가 줄어 CPU 자원 소비가 감소합니다

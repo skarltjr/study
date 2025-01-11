@@ -65,3 +65,33 @@ GC CPU Time for Cycle N=Fixed Cost+(Average Cost per Byte×Live Heap)
 - GC 실행 빈도가 낮아지면:
   - 메모리 사용량 증가: 회수되지 않은 메모리가 쌓여 힙 크기가 커집니다.
   - CPU 오버헤드 감소: GC 실행 횟수가 줄어 CPU 자원 소비가 감소합니다
+
+8. GO GC
+- go gc는 메모리와 cpu 균형을 맞추고자하는데
+  - 매 gc 사이클 이후 다음 target heap size를 결정해서 동작한다
+  - 그 방식은 `Target heap memory = Live heap + (Live heap + GC roots) * GOGC / 100`
+```
+Live Heap = 8 MiB, goroutine 스택 = 1 MiB, 글로벌 변수 포인터 = 1 MiB인 경우
+
+GOGC = 100일 때:
+Target heap size = 8 + (8 + 2) * 100 / 100 = 8 + 10 = 18 MiB
+
+참고로 gc roots란 전역변수나 고루틴 스택 등
+- gogc default : 100
+```
+- memory limit을 설정할 수 있는데 이 설정은 기본적으로 soft다.
+  - 당연하게도 메모리 부족은 애플리케이션의 중단으로 이어지기 때문이다.
+ 
+9. latency
+- go gc는 기본적으로 stop-the-world gc가 아니라 애플리케이션 실행과 병렬적으로 처리된다
+  - 물론 기본적으로 stop the world 시간 자체는 존재한다
+    - Mark와 Sweep 단계 사이의 전환 시점.
+    - Goroutines의 Root Scanning 단계(각 goroutine의 메모리 루트 확인).
+- 이 latency를 줄이기 위한 노력으론
+  - mark 시점에 전체 cpu 중 25%만 사용하여 나머지는 애플리케이션 동작을 위해 사용된다
+    - 이로인해 gc가 느려질 가능성도, 애플리케이션 throughput에 영향을 줄 순 있다.
+  - 만약 높은 메모리 할당 속도가 포착되면, gc는 사용자의 고루틴을 일부 사용하여 일부 gc 작업을 수행한다.
+  - pointer writer
+    - mark 단계에서 새롭게 객체가 생성되어 메모리 공간을 할당받을 수 있는데 놓칠 수 있다
+    - 그래서 gc는 mark 단계에서 write barrier를 통해 새로운 객체를 감시하고 변경된 포인터등을 추적하여 마킹하고 잘못 지우지 않도록 한다.
+    
